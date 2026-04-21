@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="vi" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BH-AI | Kho lưu trữ công nghệ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #050505;
+            color: #e5e7eb;
+            font-family: 'Inter', sans-serif;
+        }
+        .neon-border:focus {
+            border-color: #00ff99;
+            box-shadow: 0 0 10px rgba(0, 255, 153, 0.5);
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        .glass-card:hover {
+            border-color: #00ff99;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 255, 153, 0.1);
+        }
+        .neon-text { color: #00ff99; }
+        .neon-bg { background-color: #00ff99; }
+    </style>
+</head>
+<body class="min-h-screen pb-10">
+
+    <header class="sticky top-0 z-50 py-6 px-4 bg-[#050505]/80 backdrop-blur-md border-b border-white/10">
+        <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+            <h1 class="text-2xl font-bold tracking-tighter neon-text uppercase italic">Bình Hưng <span class="text-white">& AI</span></h1>
+            
+            <div class="relative w-full md:w-96">
+                <input type="text" id="searchInput" 
+                    placeholder="Tìm kiếm công cụ, prompt, thủ thuật..." 
+                    class="w-full bg-white/5 border border-white/20 rounded-full py-2 px-10 outline-none neon-border transition-all">
+                <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 mt-12">
+        <div class="flex flex-wrap gap-2 mb-8" id="categoryFilters">
+            <button class="filter-btn active px-4 py-1.5 rounded-full text-sm font-medium glass-card neon-text" data-cat="all">Tất cả</button>
+            <button class="filter-btn px-4 py-1.5 rounded-full text-sm font-medium glass-card hover:text-[#00ff99]" data-cat="AI Tool">AI Tool</button>
+            <button class="filter-btn px-4 py-1.5 rounded-full text-sm font-medium glass-card hover:text-[#00ff99]" data-cat="Prompt">Prompt</button>
+            <button class="filter-btn px-4 py-1.5 rounded-full text-sm font-medium glass-card hover:text-[#00ff99]" data-cat="Video">Video</button>
+        </div>
+
+        <div id="contentGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            </div>
+
+        <div id="noResult" class="hidden text-center py-20">
+            <p class="text-gray-500 italic">Không tìm thấy kết quả phù hợp...</p>
+        </div>
+    </main>
+
+    <script>
+        let allData = [];
+
+        // 1. Fetch dữ liệu từ file data.json
+        async function loadData() {
+            try {
+                const response = await fetch('data.json');
+                allData = await response.json();
+                renderCards(allData);
+            } catch (error) {
+                console.error("Lỗi khi tải dữ liệu:", error);
+                document.getElementById('contentGrid').innerHTML = `<p class="text-red-400">Lỗi: Cần chạy qua Server (như Live Server) hoặc upload lên GitHub để fetch được file JSON.</p>`;
+            }
+        }
+
+        // 2. Hàm hiển thị Card
+        function renderCards(data) {
+            const grid = document.getElementById('contentGrid');
+            const noResult = document.getElementById('noResult');
+            grid.innerHTML = '';
+
+            if (data.length === 0) {
+                noResult.classList.remove('hidden');
+            } else {
+                noResult.classList.add('hidden');
+                data.forEach(item => {
+                    const card = `
+                        <div class="glass-card rounded-2xl p-6 flex flex-col justify-between">
+                            <div>
+                                <div class="flex justify-between items-start mb-4">
+                                    <span class="text-[10px] uppercase tracking-widest px-2 py-1 bg-white/10 rounded-md text-[#00ff99] border border-[#00ff99]/20 font-bold">
+                                        ${item.category}
+                                    </span>
+                                    <i class="fa-solid fa-arrow-up-right-from-square text-gray-500 text-xs"></i>
+                                </div>
+                                <h3 class="text-xl font-semibold mb-2 group-hover:neon-text">${item.title}</h3>
+                                <p class="text-gray-400 text-sm leading-relaxed mb-4">${item.desc}</p>
+                            </div>
+                            
+                            <div class="flex flex-wrap gap-2 mb-4">
+                                ${item.tags.map(tag => `<span class="text-[10px] text-gray-500">#${tag}</span>`).join('')}
+                            </div>
+
+                            <a href="${item.link || '#'}" target="_blank" class="w-full py-2 text-center rounded-lg bg-white/5 hover:bg-[#00ff99] hover:text-black transition-all font-bold text-sm">
+                                CHI TIẾT
+                            </a>
+                        </div>
+                    `;
+                    grid.innerHTML += card;
+                });
+            }
+        }
+
+        // 3. Xử lý tìm kiếm
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const keyword = e.target.value.toLowerCase();
+            const filtered = allData.filter(item => 
+                item.title.toLowerCase().includes(keyword) || 
+                item.desc.toLowerCase().includes(keyword) ||
+                item.tags.some(tag => tag.toLowerCase().includes(keyword))
+            );
+            renderCards(filtered);
+        });
+
+        // 4. Xử lý lọc theo Category
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Thay đổi style nút
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('neon-text', 'border-[#00ff99]/50'));
+                btn.classList.add('neon-text', 'border-[#00ff99]/50');
+
+                const cat = btn.getAttribute('data-cat');
+                if (cat === 'all') {
+                    renderCards(allData);
+                } else {
+                    const filtered = allData.filter(item => item.category === cat);
+                    renderCards(filtered);
+                }
+            });
+        });
+
+        // Khởi chạy
+        loadData();
+    </script>
+</body>
+</html>
