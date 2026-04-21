@@ -1,0 +1,26 @@
+[
+    {
+        "id": 1,
+        "title": "Khai thác sức mạnh Gemini Pro",
+        "category": "AI Tool",
+        "desc": "Hướng dẫn sử dụng API của Gemini để tích hợp vào ứng dụng quản lý văn bản tại xã.",
+        "link": "https://google.com",
+        "tags": ["Gemini", "API", "Bình Hưng"]
+    },
+    {
+        "id": 2,
+        "title": "Prompt tạo báo cáo hành chính",
+        "category": "Prompt",
+        "desc": "Mẫu câu lệnh giúp chuyển đổi ghi chú cuộc họp thành văn bản hành chính chuẩn 100%.",
+        "link": "#",
+        "tags": ["ChatGPT", "Admin"]
+    },
+    {
+        "id": 3,
+        "title": "Video: Quy trình bầu cử 2026",
+        "category": "Video",
+        "desc": "Video hướng dẫn cử tri thực hiện quy trình bầu cử tại xã Bình Hưng.",
+        "link": "https://youtube.com",
+        "tags": ["Bầu cử", "Video"]
+    }
+]
